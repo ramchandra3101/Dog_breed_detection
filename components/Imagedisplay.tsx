@@ -23,37 +23,44 @@ export default function Imagedisplay({
   const { imageURI } = route.params;
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectBreed, setDetectBreed] = useState<string | null>(null);
+  
 
   
 
   const handleDetection = async () => {
     setIsProcessing(true);
     setDetectBreed(null);
+    
+  
+  console.log(imageURI);
 
+    // Create a new FormData object to send the image data
     const formData = new FormData();
-    // Instead of converting to a blob, directly use the image URI
     formData.append("image", {
       uri: imageURI,
-      name: "image.jpg", // Name of the file
-      type: "image/jpeg", // MIME type of the image
+      name: "image.jpg",
+      type: "image/jpeg",
     });
 
-    console.log(formData);
+    // Append the image to the form data
+
+    
 
     try {
-      const response = await fetch("http://10.0.0.72:3000/predict/", {
+      const response = await fetch("http://10.110.39.53:8000/api/predict/", {
         method: "POST",
-        body: formData, // No need to set Content-Type manually
+        body: formData,
       });
 
-      console.log(response.status);
+    
 
       if (!response.ok) {
         throw new Error("Failed to detect breed");
       }
 
       const result = await response.json();
-      const breed = result.predicted_breed || "Unknown breed";
+      console.log(result);
+      const breed = result.breed.predicted_breed || "Unknown breed";
       setDetectBreed(breed);
     } catch (error) {
       if (error instanceof Error) {
