@@ -5,6 +5,7 @@ import {
   Text,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import ImagedisplayStyles from "../styles/ImagedisplayStyles";
 import { useState } from "react";
@@ -14,6 +15,10 @@ type RootStackParamList = {
   ImageDisplay: { imageURI: string };
 };
 type ImagedisplayRouteProp = RouteProp<RootStackParamList, "ImageDisplay">;
+type BreedPrediction = {
+  breed: string;
+  confidence: number;
+};
 
 export default function Imagedisplay({
   route,
@@ -22,14 +27,11 @@ export default function Imagedisplay({
 }) {
   const { imageURI } = route.params;
   const [isProcessing, setIsProcessing] = useState(false);
-  const [detectBreed, setDetectBreed] = useState<string | null>(null);
-  
-
-  
+  const [breedPredictions, setBreedPredictions] = useState<BreedPrediction[] | null>(null);
 
   const handleDetection = async () => {
     setIsProcessing(true);
-    setDetectBreed(null);
+    setBreedPredictions(null);
     
   
   console.log(imageURI);
@@ -47,7 +49,7 @@ export default function Imagedisplay({
     
 
     try {
-      const response = await fetch("http://10.110.39.53:8000/api/predict/", {
+      const response = await fetch("http://10.194.58.136:8000/api/predict/", {
         method: "POST",
         body: formData,
       });
@@ -59,9 +61,12 @@ export default function Imagedisplay({
       }
 
       const result = await response.json();
-      console.log(result);
-      const breed = result.breed.predicted_breed || "Unknown breed";
-      setDetectBreed(breed);
+      console.log(result.breed.top_3_breeds);
+      const predictions = result.breed.top_3_breeds.map((item: [string, number]) => ({
+        breed: item[0],
+        confidence: item[1],
+      }));
+      setBreedPredictions(predictions);
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert("Error", error.message);
@@ -100,10 +105,16 @@ export default function Imagedisplay({
           <Text style={ImagedisplayStyles.ButtonText}>Detect Breed</Text>
         )}
       </TouchableOpacity>
-      {detectBreed && (
-        <Text style={ImagedisplayStyles.ResultText}>
-          Detected Breed: {detectBreed}
-        </Text>
+      {breedPredictions && (
+        <FlatList
+          data={breedPredictions}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Text style={ImagedisplayStyles.ResultText}>
+              {item.breed}: {item.confidence.toFixed(2)}%
+            </Text>
+          )}
+        />
       )}
     </View>
   );

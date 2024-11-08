@@ -34,5 +34,17 @@ export default StyleSheet.create({
       ResultText: {
         marginTop: 20,
         fontSize: 18,
-      },
+        fontWeight: "600", // Makes the text semi-bold for better emphasis
+        color: "#333333", // Dark gray for better readability
+        backgroundColor: "#f2f2f2", // Light background to create contrast
+        padding: 10, // Adds spacing around the text
+        borderRadius: 8, // Rounds the corners for a softer look
+        textAlign: "center", // Centers the text for uniform display
+        // shadowColor: "#000", // Adds shadow for depth
+        // shadowOffset: { width: 0, height: 2 }, // Horizontal and vertical shadow offset
+        // shadowOpacity: 0.2, // Opacity of the shadow
+        // shadowRadius: 3, // Blur radius of the shadow
+        // elevation: 3, // Shadow effect for Android
+        }
+      
 });
